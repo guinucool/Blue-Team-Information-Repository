@@ -1,5 +1,7 @@
 # Blue Team Tool Repository
 
+This repository represents an initial version that will be further refined and expanded for the final attack–defense exercise.
+
 ## Hardening
 
 ## Intrusion Detection
