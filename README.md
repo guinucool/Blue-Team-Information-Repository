@@ -241,9 +241,69 @@ These section will cover the followings SIEM's:
 
 ## Adversary Emulation
 
-Adversary Emulation consists of...
+Adversary emulation is the structured simulation of real-world threat actor behaviors, techniques, and procedures within a controlled environment. Its purpose is to evaluate the effectiveness of defensive controls, detection mechanisms, and incident response processes by replicating how adversaries operate during different phases of an attack lifecycle.
 
-This section will cover the following Adversary Emulation tools:
+Unlike generic penetration testing, adversary emulation is intelligence-driven and commonly aligned with established frameworks such as MITRE ATT&CK. By executing known adversarial techniques, defensive teams can validate detection coverage, identify security gaps, and measure the maturity of monitoring and response capabilities.
+
+This section covers the following adversary emulation tool:
+
 - [Atomic Red Team](#atomic-red-team)
 
 ### Atomic Red Team
+
+Atomic Red Team is an open-source adversary emulation framework designed to help security teams test and validate defensive controls by executing small, focused tests that simulate individual adversary techniques. Each test, referred to as an *atomic test*, represents a specific behavior mapped to the MITRE ATT&CK framework and is intended to be safe, repeatable, and measurable.
+
+Atomic Red Team enables defenders to assess detection and response capabilities at a granular level by emulating techniques such as credential access, lateral movement, persistence, and command execution. The framework supports multiple operating systems and execution methods, allowing it to be integrated into continuous security validation, purple team exercises, and detection engineering workflows.
+
+```
+https://www.atomicredteam.io/
+```
+
+#### Installation & Configuration
+
+Atomic Red Team relies on PowerShell for execution. On Linux systems, PowerShell must be installed prior to deploying the framework. Official installation instructions are available from Microsoft:
+
+> https://learn.microsoft.com/en-us/powershell/scripting/install/install-ubuntu?view=powershell-7.5
+
+The installation process consists of two main steps: installing the Atomic Red Team PowerShell framework and downloading the atomic tests, which represent individual adversary techniques and procedures (TTPs).
+
+The following commands install the required PowerShell modules for the current user:
+
+```powershell
+# Install the Atomic Red Team framework and required dependencies
+Install-Module -Name invoke-atomicredteam,powershell-yaml -Scope CurrentUser
+
+# Download and install the Atomic Red Team TTPs
+IEX (IWR 'https://raw.githubusercontent.com/redcanaryco/invoke-atomicredteam/master/install-atomicsfolder.ps1' -UseBasicParsing)
+
+Install-AtomicsFolder
+```
+
+#### Usage
+
+Atomic Red Team can be used to enumerate available adversary techniques, inspect the atomic tests associated with each technique, validate execution prerequisites, and safely execute or clean up simulated attacks. These capabilities enable defenders to systematically test detection and response mechanisms aligned with specific MITRE ATT&CK techniques.
+
+The following examples demonstrate common usage patterns of the `Invoke-AtomicTest` command.
+
+```powershell
+# List atomic tests available for the current operating system (Windows, Linux, or macOS)
+Invoke-AtomicTest T1003 -ShowDetailsBrief
+
+# List all atomic tests for a technique, regardless of supported operating system
+Invoke-AtomicTest T1003 -ShowDetailsBrief -AnyOS
+
+# Check whether prerequisites are met before executing the atomic tests
+Invoke-AtomicTest T1003 -CheckPrereqs
+
+# Execute test number 1 of sub-technique T1218.010
+Invoke-AtomicTest T1218.010 -TestNumbers 1
+
+# Execute test number 1 using the abbreviated syntax
+Invoke-AtomicTest T1218.010-1
+
+# Clean up artifacts created by test number 1 of sub-technique T1218.010
+Invoke-AtomicTest T1218.010 -TestNumbers 1 -Cleanup
+
+# Clean up artifacts created by all executed tests for sub-technique T1218.010
+Invoke-AtomicTest T1218.010 -Cleanup
+```
